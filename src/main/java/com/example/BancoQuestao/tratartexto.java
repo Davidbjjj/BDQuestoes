@@ -1,4 +1,4 @@
-package org.example;
+package com.example.BancoQuestao;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

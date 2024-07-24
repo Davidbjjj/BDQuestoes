@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Texto Tratado</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <script>
+                        const gabarito = " + gabaritoJSArray.toString() + ";
+                        function verificarResposta(questionNumber) {
+                            const form = document.getElementById('formQuestion' + questionNumber);
+                           const radios = form.querySelectorAll('input[type=\"radio\"]');
+                            let selectedAnswer = null;
+                            radios.forEach(radio => {
+                                if (radio.checked) {
+                                    selectedAnswer = radio.value;
+                                }
+                            });
+                            const resultElement = document.getElementById('resultado' + questionNumber);
+                            if (selectedAnswer) {
+                                const correctAnswer = gabarito[questionNumber - 1];
+                                if (selectedAnswer.trim().toUpperCase() === correctAnswer) {
+                                    resultElement.textContent = 'Resposta correta!';
+                                    resultElement.className = 'text-success';
+                                } else {
+                                    resultElement.textContent = 'Resposta incorreta.';
+                                    resultElement.className = 'text-danger';
+                                }
+                            } else {
+                                resultElement.textContent = 'Por favor, selecione uma resposta.';
+                           resultElement.className = 'text-warning';
+                 }
+                }
+    </script>
+</head>
+<body>
+<div class="container">
+    <h1 class="my-4">Texto Tratado</h1>
+    <div th:utext="${treatedText}"></div>
+</div>
+</body>
+</html>
