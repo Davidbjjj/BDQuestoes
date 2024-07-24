@@ -25,29 +25,50 @@ public class tratartexto {
             Pattern patternEEAR = Pattern.compile("(\\d+\\.\\s\\([^\\)]+\\))(.*?)(?=\\d+\\.\\s\\([^\\)]+\\)|$)", Pattern.DOTALL);
             Matcher matcherEEAR = patternEEAR.matcher(texto);
 
+            int questionCounter = 0;
+
             while (matcherEEAR.find()) {
-                // Adiciona a questão atual ao texto tratado
-                textoTratado.append(matcherEEAR.group(1)).append("\n");
+                questionCounter++; // Incrementa o contador de questões
+
+                // Adiciona a questão atual ao texto tratado em HTML
+                textoTratado.append("<div class=\"card my-2\">\n<div class=\"card-body\">\n");
+
+                // Adiciona o título da questão
+                textoTratado.append("<h5 class=\"card-title\">").append(matcherEEAR.group(1)).append("</h5>\n");
 
                 // Adiciona o texto da questão e as alternativas
                 String questionText = matcherEEAR.group(2).trim();
-                String[] alternativas = {"a)", "b)", "c)", "d)", "e)"};
+                String[] alternativas = {"A)", "B)", "C)", "D)", "E)", "a)", "b)", "c)", "d)", "e)", "(A)", "(B)", "(C)", "(D)", "(E)", "(a)", "(b)", "(c)", "(d)", "(e)"};
 
-                // Adiciona o texto entre a questão e as alternativas ao texto tratado
+                // Encontra o índice inicial das alternativas
+                int startIndex = questionText.length();
+                for (String alternativa : alternativas) {
+                    int altIndex = questionText.indexOf(alternativa);
+                    if (altIndex != -1 && altIndex < startIndex) {
+                        startIndex = altIndex;
+                    }
+                }
+
+                // Adiciona o texto da questão antes das alternativas
+                textoTratado.append("<p class=\"card-text\">").append(questionText, 0, startIndex).append("</p>\n<form>\n");
+
+                // Adiciona as alternativas ao texto tratado como botões de rádio
+                questionText = questionText.substring(startIndex);
                 for (String alternativa : alternativas) {
                     int altIndex = questionText.indexOf(alternativa);
                     if (altIndex != -1) {
                         int endIndex = findEndIndex(questionText, altIndex + alternativa.length(), alternativas);
-                        textoTratado.append(questionText, 0, altIndex).append("\n");
-                        textoTratado.append(alternativa).append(" ").append(questionText.substring(altIndex + alternativa.length(), endIndex).trim()).append("\n");
+                        textoTratado.append("<div class=\"form-check\">\n")
+                                .append("<input class=\"form-check-input\" type=\"radio\" name=\"question").append(questionCounter)
+                                .append("\" id=\"question").append(questionCounter).append(alternativa).append("\">\n")
+                                .append("<label class=\"form-check-label\" for=\"question").append(questionCounter).append(alternativa).append("\">\n")
+                                .append(alternativa).append(" ").append(questionText, altIndex + alternativa.length(), endIndex).append("\n")
+                                .append("</label>\n</div>\n");
                         questionText = questionText.substring(endIndex).trim();
                     }
                 }
 
-                // Adiciona o texto restante após a última alternativa
-                if (!questionText.isEmpty()) {
-                    textoTratado.append(questionText).append("\n");
-                }
+                textoTratado.append("</form>\n</div>\n</div>\n");
             }
         }
     }
