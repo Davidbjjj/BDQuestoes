@@ -2,12 +2,14 @@
   "version": 2,
   "builds": [
     {
-      "src": "pom.xml",
-      "use": "@vercel/java"
+      "src": "Dockerfile",
+      "use": "@vercel/docker"
     }
   ],
   "routes": [
-    { "src": "/upload", "dest": "/src/main/java/com/example/BancoQuestao/ArquivoController.java" },
-    { "src": "/", "dest": "/src/main/resources/templates/index.html" }
+    {
+      "src": "/(.*)",
+      "dest": "/"
+    }
   ]
 }
