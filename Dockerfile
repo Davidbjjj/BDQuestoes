@@ -1,15 +1,17 @@
-{
-  "version": 2,
-  "builds": [
-    {
-      "src": "pom.xml",
-      "use": "@vercel/static-build"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
-    }
-  ]
-}
+FROM ubuntu:latest AS  build
+
+RUN apt-get update
+RUN apt-get install openjdk-17-jdk -y
+
+COPY . .
+
+RUN apt-get install maven -y
+RUN apt-get clean install
+
+FROM openjdk:17-jdk-slim
+
+EXPOSE 8080
+
+COPY --from=build /target/BancoQuestao-0.0.1-SNAPSHOT.jar app.jar
+
+ENTRYPOINT ["java", "-jar", "app.jar"]
