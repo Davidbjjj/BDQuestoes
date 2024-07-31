@@ -61,6 +61,9 @@ public class tratartexto {
                 String questionText = matcherEEAR.group(2).trim();
                 String[] alternativas = {"A)", "B)", "C)", "D)", "E)", "a)", "b)", "c)", "d)", "e)", "(A)", "(B)", "(C)", "(D)", "(E)", "(a)", "(b)", "(c)", "(d)", "(e)"};
 
+                // Renderiza expressões matemáticas delimitadas por $$
+                questionText = renderMathExpressions(questionText);
+
                 // Encontra o índice inicial das alternativas
                 int startIndex = questionText.length();
                 for (String alternativa : alternativas) {
@@ -107,5 +110,12 @@ public class tratartexto {
             }
         }
         return minIndex;
+    }
+
+    // Função para renderizar expressões matemáticas delimitadas por $$
+    private String renderMathExpressions(String text) {
+        // Aqui você pode adicionar lógica para converter expressões LaTeX para HTML
+        // ou outro formato de renderização. Exemplo simples:
+        return text.replaceAll("\\$\\$(.*?)\\$\\$", "<span class=\"math\">$1</span>");
     }
 }
