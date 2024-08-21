@@ -10,6 +10,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 
 public class tratartexto {
     private String texto;
@@ -45,6 +47,7 @@ public class tratartexto {
         }
 
         // Salva o arquivo em um diretório acessível para leitura posterior
+        // Ajuste o caminho conforme necessário para o seu ambiente
         String caminho = "src/main/resources/static/gabarito.json";
 
         try (FileWriter writer = new FileWriter(caminho)) {
@@ -58,20 +61,20 @@ public class tratartexto {
 
     public void tratarTexto() {
         if (texto != null) {
-            // Padrão para capturar o texto após "GABARITO" e antes das alternativas
-            Pattern patternGabarito = Pattern.compile("(?i)GABARITO\\s*(.*?)(\\d+\\)?\\s*[A-E]\\s*)+", Pattern.DOTALL);
+            // Atualizado padrão para capturar o gabarito com pontos ou parênteses
+            Pattern patternGabarito = Pattern.compile("(?i)GABARITO\\s+(\\d+\\s*[.)]?\\s*[A-E]\\s*)+", Pattern.DOTALL);
             Matcher matcherGabarito = patternGabarito.matcher(texto);
 
             String gabaritoText = null;
 
             if (matcherGabarito.find()) {
-                gabaritoText = matcherGabarito.group(2);  // Captura apenas a parte das respostas
-                texto = texto.replace(matcherGabarito.group(0), "");  // Remove o gabarito do texto original
+                gabaritoText = matcherGabarito.group();  // Captura toda a parte do gabarito
+                texto = texto.replace(matcherGabarito.group(), "");  // Remove o gabarito do texto original
             }
 
             if (gabaritoText != null) {
-                // Remove qualquer texto não relacionado às alternativas
-                Pattern patternRespostas = Pattern.compile("(\\d+)\\)?\\s*([A-E])");
+                // Ajuste para capturar tanto o formato com ponto quanto parêntese
+                Pattern patternRespostas = Pattern.compile("(\\d+)\\s*[.)]?\\s*([A-E])");
                 Matcher matcherRespostas = patternRespostas.matcher(gabaritoText);
 
                 while (matcherRespostas.find()) {
@@ -175,32 +178,19 @@ public class tratartexto {
     }
 
     // Encontra o índice de término da alternativa atual até a próxima alternativa ou o final do texto
-    private int findEndIndex(String text, int startIndex, String[] alternativas) {
-        int endIndex = text.length();
+    private int findEndIndex(String text, int start, String[] alternativas) {
+        int minIndex = text.length();
         for (String alternativa : alternativas) {
-            int altIndex = text.indexOf(alternativa, startIndex);
-            if (altIndex != -1 && altIndex < endIndex) {
-                endIndex = altIndex;
+            int index = text.indexOf(alternativa, start);
+            if (index != -1 && index < minIndex) {
+                minIndex = index;
             }
         }
-        return endIndex;
+        return minIndex;
     }
 
-    // Renderiza expressões matemáticas delimitadas por $$ com marcação específica
+    // Função para renderizar expressões matemáticas delimitadas por $$
     private String renderMathExpressions(String text) {
-        // Regex para identificar expressões matemáticas entre $$
-        Pattern patternMath = Pattern.compile("\\$\\$(.*?)\\$\\$", Pattern.DOTALL);
-        Matcher matcherMath = patternMath.matcher(text);
-
-        StringBuffer buffer = new StringBuffer();
-
-        while (matcherMath.find()) {
-            String mathExpression = matcherMath.group(1);
-            // Substitui as expressões matemáticas por uma marcação específica
-            matcherMath.appendReplacement(buffer, "<div class=\"math-expression\">" + mathExpression + "</div>");
-        }
-        matcherMath.appendTail(buffer);
-
-        return buffer.toString();
+        return text.replaceAll("\\$\\$(.*?)\\$\\$", "<span class=\"math\">$1</span>");
     }
 }
